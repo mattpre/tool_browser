@@ -6,7 +6,7 @@
 import os,math
 import numpy as np
 import matplotlib.pyplot as plt
-import cPickle as pickle
+import pickle
 from matplotlib.patches import Polygon
 from matplotlib.patches import Rectangle
 from matplotlib.collections import PatchCollection
@@ -14,13 +14,8 @@ from matplotlib.collections import PatchCollection
 
 from zsoil_tools import zsoil_results as zr
 
-pathname = '../profil001'
-pblist = ['M1161_P001_v2']
-
-etapes = [(2,u'tunnel LO excavé'),
-          (3,u'Palace construit'),
-          (5,u'tunnel Ouest excavé'),
-          (7,u'tunnel Est excavé')]
+pathname = '..'
+pblist = ['M1352_km4726_cyclTrain_drainagef16_v1_1(mat)_red']
 
 for kp,prob in enumerate(pblist):
 
@@ -46,54 +41,16 @@ for kp,prob in enumerate(pblist):
         res.read_s00()
         pickle.dump(res, open(prob+'_disp.p', "wb" ) ,pickle.HIGHEST_PROTOCOL)
 
-    crds = [np.array([1.74955e+01,2.49552e+01]),
-             np.array([1.40613e+01,2.40872e+01]),
-             np.array([2.27609e+01,1.73308e+01]),
-             np.array([1.22234e+01,1.79991e+01]),
-             np.array([1.86667e+01,4.65000e+01]),
-             np.array([2.28444e+01,3.15000e+01]),
-             np.array([4.00519e+01,3.15000e+01]),
-             np.array([-1.81419e+00,2.31425e+01]),
-             np.array([2.38765e+01,2.53477e+01])]
-    labs = [u'Clé de voûte tunnel LO',
-            u'Point de voûte tunnel LO',
-            u'Piédroit Est tunnel LO',
-            u'Piédroit Ouest tunnel LO',
-            u'TN à côté Hôtel Palace, 465 msm',
-            u'Base Ouest de fondation Palace',
-            u'Base Est de fondation Palace',
-            u'Clé de voûte tunnel Ouest',
-            u'Clé de voûte tunnel Est']
-    bnds = set()
-    for ke in range(res.nBeams):
-        inel = res.beam.inel[ke]
-        for kn in inel:
-            bnds.add(kn-1)
-    bnds = list(bnds)
-    LOnds = set()
-    for ke in range(res.nVolumics):
-        if res.vol.EF[ke] in [1,12]:
-            inel = res.vol.inel[ke]
-            for kn in inel:
-                LOnds.add(kn-1)
-    LOnds = sorted(list(LOnds))
-    astr = str()
-    for kn in LOnds:
-        astr += ' %i'%(kn+1)
-    nlist = [-1 for k in labs]
+    crds = [np.array([3,3.20781e+01]),
+            np.array([3,3.30781e+01]),
+            np.array([3,3.48475e+01])]
+
+    nlist = [-1 for k in crds]
     for kn in range(res.nNodes):
-        if not kn in bnds:
-            for kk,crd in enumerate(crds):
-                if abs(res.coords[0][kn]-crd[0])<1e-3:
-                    if abs(res.coords[1][kn]-crd[1])<1e-3:
-                        if kk<4:
-                            if kn in LOnds:
-                                nlist[kk] = kn
-                        else:
-                            nlist[kk] = kn
-    if min(nlist)==-1:
-        print('point not found!')
-##    step0 = res.steps[tsteps[2]]
+        for kk,crd in enumerate(crds):
+            if abs(res.coords[0][kn]-crd[0])<1e-3:
+                if abs(res.coords[1][kn]-crd[1])<1e-3:
+                    nlist[kk] = kn
 
     tx = []
     uh = [[] for kn in nlist]
